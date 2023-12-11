@@ -1,23 +1,25 @@
 #pragma once
 
-#include "hittable.h"
-#include "vec3.h"
+#include "ray_tracing_in_one_weekend.h"
+#include <memory>
 
-class Sphere : public Hittable {
-    public:
-        Sphere() {}
-        Sphere(Point3 center, double radius) : center_(center), radius_(radius) {};
+class Sphere : public Hittable
+{
+public:
+    Sphere() {}
+    Sphere(Point3 center, double radius, std::shared_ptr<Material> mat_ptr) : center_(center), radius_(radius), mat_ptr_(mat_ptr){};
 
-        virtual bool hit(
-            const Ray& r, double t_min, double t_max, HitRecord& rec
-        ) const override;
+    virtual bool hit(
+        const Ray &r, double t_min, double t_max, HitRecord &rec) const override;
 
-    public:
-        Point3 center_;
-        double radius_;
+public:
+    Point3 center_;
+    double radius_;
+    std::shared_ptr<Material> mat_ptr_;
 };
 
-bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const {
+bool Sphere::hit(const Ray &r, double t_min, double t_max, HitRecord &rec) const
+{
     // Does somewhere on the ray P(t) hit the circle?
     // In other words, does there exist a point on the ray such that
     // the vector from the center of the circle to that ray
@@ -47,17 +49,18 @@ bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const
     Vec3 q = r.origin() - center_;
     auto a = dot(r.direction(), r.direction());
     auto b = 2.0 * dot(q, r.direction());
-    auto c = dot(q, q) - radius_*radius_;
-    auto discriminant = b*b - 4*a*c;
+    auto c = dot(q, q) - radius_ * radius_;
+    auto discriminant = b * b - 4 * a * c;
     if (discriminant < 0)
         return false;
 
     auto sqrtd = sqrt(discriminant);
 
     // find the nearest root within t_min t_max
-    auto root = (-b - sqrtd) / (2.0*a);
-    if (root < t_min || root > t_max) {
-        root = (-b + sqrtd) / (2.0*a);
+    auto root = (-b - sqrtd) / (2.0 * a);
+    if (root < t_min || root > t_max)
+    {
+        root = (-b + sqrtd) / (2.0 * a);
         if (root < t_min || root > t_max)
             return false;
     }
@@ -66,6 +69,6 @@ bool Sphere::hit(const Ray& r, double t_min, double t_max, HitRecord& rec) const
     rec.p = r.at(rec.t);
     Vec3 outward_normal = (rec.p - center_) / radius_;
     rec.set_face_normal(r, outward_normal);
+    rec.mat_ptr = mat_ptr_;
     return true;
 }
-

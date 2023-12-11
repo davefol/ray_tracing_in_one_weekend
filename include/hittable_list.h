@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hittable.h"
+#include "ray_tracing_in_one_weekend.h"
 
 #include <vector>
 #include <memory>

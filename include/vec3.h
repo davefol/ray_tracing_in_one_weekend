@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "ray_tracing_in_one_weekend.h"
 
 class Vec3
 {
@@ -47,6 +48,19 @@ public:
     {
         return e_[0] * e_[0] + e_[1] * e_[1] + e_[2] * e_[2];
     }
+
+    inline static Vec3 random() {
+        return Vec3(random_double(), random_double(), random_double());
+    }
+
+    inline static Vec3 random(double min, double max) {
+        return Vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+    }
+
+    bool near_zero() const {
+        const auto eps = 1e-8;
+        return (fabs(e_[0]) < eps) && (fabs(e_[1]) < eps) && (fabs(e_[2]) < eps);
+    } 
 
 public:
     double e_[3];
@@ -105,4 +119,20 @@ inline Vec3 cross(const Vec3& u, Vec3& v) {
 
 inline Vec3 unit_vector(Vec3 v) {
     return v / v.length();
+}
+
+Vec3 random_in_unit_sphere() {
+    while (true) {
+        auto sample = Vec3::random(-1, 1);
+        if (sample.length() >= 1) continue;
+        return sample;
+    }
+}
+
+Vec3 random_unit_vector() {
+    return unit_vector(random_in_unit_sphere());
+}
+
+Vec3 reflect(const Vec3& v, const Vec3& n) {
+    return v - 2*dot(v, n)*n;
 }

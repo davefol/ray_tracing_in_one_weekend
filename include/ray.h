@@ -1,5 +1,5 @@
 #pragma once
-#include "vec3.h"
+#include "ray_tracing_in_one_weekend.h"
 
 class Ray {
     public:
